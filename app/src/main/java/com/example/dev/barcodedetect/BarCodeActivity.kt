@@ -1,6 +1,7 @@
 package com.example.dev.barcodedetect
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.SurfaceHolder
@@ -10,7 +11,7 @@ import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
-import kotlinx.android.synthetic.main.activity_bar_code.barcode_value
+import kotlinx.android.synthetic.main.activity_bar_code.barcode_textView
 import kotlinx.android.synthetic.main.activity_bar_code.surface_view
 import java.io.IOException
 
@@ -24,16 +25,36 @@ class BarCodeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bar_code)
         cameraView = surface_view
-        barcodeValue = barcode_value
+        barcodeValue = barcode_textView
 
         barcodeDetector = BarcodeDetector.Builder(this)
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
                 .build()
 
-        cameraSource = CameraSource.Builder(this, barcodeDetector!!)
+        cameraSource = CameraSource.Builder(this, barcodeDetector)
                 .setRequestedPreviewSize(1600, 1024)
-                .setAutoFocusEnabled(true) //you should add this feature
+                .setAutoFocusEnabled(true)
                 .build()
+
+        barcodeDetector?.setProcessor(object : Detector.Processor<Barcode?> {
+
+            override fun release() {}
+
+            override fun receiveDetections(detections: Detector.Detections<Barcode?>?) {
+                val barcodes = detections?.detectedItems
+                if (barcodes?.size() != 0) {
+//                    barcodeValue?.post {
+//                        //Update barcode value to TextView
+//                        barcodeValue?.setText(barcodes?.valueAt(0)?.displayValue)
+//                    }
+                    val intent = Intent()
+                    intent.putExtra("barcode", barcodes?.valueAt(0))
+                    setResult(1000, intent)
+                    finish()
+                }
+            }
+        })
+
         cameraView?.holder?.addCallback(object : SurfaceHolder.Callback {
             @SuppressLint("MissingPermission")
             override fun surfaceCreated(holder: SurfaceHolder) {
@@ -52,20 +73,6 @@ class BarCodeActivity : AppCompatActivity() {
             }
         })
 
-        barcodeDetector?.setProcessor(object : Detector.Processor<Barcode?> {
-
-            override fun release() {}
-
-            override fun receiveDetections(detections: Detector.Detections<Barcode?>?) {
-                val barcodes = detections?.detectedItems
-                if (barcodes?.size() != 0) {
-                    barcodeValue?.post {
-                        //Update barcode value to TextView
-                        barcodeValue?.setText(barcodes?.valueAt(0)?.displayValue)
-                    }
-                }
-            }
-        })
     }
 
     override fun onDestroy() {
