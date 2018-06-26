@@ -1,39 +1,38 @@
 package com.example.dev.barcodedetect
 
-import android.graphics.BitmapFactory
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
-import com.google.android.gms.vision.Frame
-import com.google.android.gms.vision.barcode.Barcode
-import com.google.android.gms.vision.barcode.BarcodeDetector
-import kotlinx.android.synthetic.main.activity_main.button
-import kotlinx.android.synthetic.main.activity_main.imgview
-import kotlinx.android.synthetic.main.activity_main.txtContent
+import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private val PERMISSION_CAMERA = 1000
+
+    public override fun onCreate(icicle: Bundle?) {
+        super.onCreate(icicle)
         setContentView(R.layout.activity_main)
-        button.setOnClickListener {
-            val myBitmap = BitmapFactory.decodeResource(
-                    applicationContext.resources,
-                    R.drawable.puppy)
-            imgview.setImageBitmap(myBitmap)
 
-            val detector = BarcodeDetector.Builder(applicationContext)
-                    .setBarcodeFormats(Barcode.DATA_MATRIX or Barcode.QR_CODE)
-                    .build()
+        ActivityCompat.requestPermissions(this,
+                arrayOf(android.Manifest.permission.CAMERA),
+                PERMISSION_CAMERA)
 
-            if (!detector.isOperational) {
-                txtContent.setText("Could not set up the detector!")
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSION_CAMERA -> {
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startActivity(Intent(this, BarCodeActivity::class.java))
+                } else{
+                    Toast.makeText(this, "Acesso da camera não autorizado", Toast.LENGTH_SHORT).show()
+                    ActivityCompat.requestPermissions(this,
+                            arrayOf(android.Manifest.permission.CAMERA),
+                            PERMISSION_CAMERA)
+                }
             }
-
-            val frame = Frame.Builder().setBitmap(myBitmap).build()
-            val barcodes = detector.detect(frame)
-
-            val thisCode = barcodes.valueAt(0)
-            txtContent.text = thisCode.displayValue
         }
 
     }
