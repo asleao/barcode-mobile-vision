@@ -1,12 +1,17 @@
 package com.example.dev.barcodedetect
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.TextView
+import android.widget.Toast
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
@@ -20,6 +25,8 @@ class BarCodeActivity : AppCompatActivity() {
     private var cameraSource: CameraSource? = null
     private var cameraView: SurfaceView? = null
     private var barcodeValue: TextView? = null
+
+    private val PERMISSION_CAMERA = 1000
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,14 +50,9 @@ class BarCodeActivity : AppCompatActivity() {
             override fun receiveDetections(detections: Detector.Detections<Barcode?>?) {
                 val barcodes = detections?.detectedItems
                 if (barcodes?.size() != 0) {
-//                    barcodeValue?.post {
-//                        //Update barcode value to TextView
-//                        barcodeValue?.setText(barcodes?.valueAt(0)?.displayValue)
-//                    }
-                    val intent = Intent()
+                    val intent = Intent(this@BarCodeActivity, MainActivity::class.java)
                     intent.putExtra("barcode", barcodes?.valueAt(0))
-                    setResult(1000, intent)
-                    finish()
+                    startActivity(intent)
                 }
             }
         })
@@ -59,7 +61,11 @@ class BarCodeActivity : AppCompatActivity() {
             @SuppressLint("MissingPermission")
             override fun surfaceCreated(holder: SurfaceHolder) {
                 try {
-                    cameraSource?.start(cameraView?.holder)
+                    if (ContextCompat.checkSelfPermission(this@BarCodeActivity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        requestCameraPermission()
+                    } else {
+                        cameraSource?.start(cameraView?.holder)
+                    }
                 } catch (ex: IOException) {
                     ex.printStackTrace()
                 }
@@ -72,6 +78,26 @@ class BarCodeActivity : AppCompatActivity() {
                 cameraSource?.stop()
             }
         })
+
+    }
+
+    private fun requestCameraPermission() {
+        ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.CAMERA),
+                PERMISSION_CAMERA)
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSION_CAMERA -> {
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    cameraSource?.start(cameraView?.holder)
+                } else {
+                    Toast.makeText(this, "Acesso da camera não autorizado", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
 
     }
 

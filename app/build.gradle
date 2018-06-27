@@ -5,6 +5,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
+    signingConfigs {
+        gertec {
+            keyAlias 'developmentquality_customerapp'
+            keyPassword 'Development@Quality2018'
+            storeFile file('C:/Users/dev/Desktop/Certificados/Gertec/Development_Quality_CustomerAPP.jks')
+            storePassword 'Development@Quality2018'
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.example.dev.barcodedetect"
@@ -18,6 +26,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.gertec
         }
     }
 }
