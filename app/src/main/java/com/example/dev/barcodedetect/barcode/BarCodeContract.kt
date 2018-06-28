@@ -1,9 +1,6 @@
 package com.example.dev.barcodedetect.barcode
 
-import android.app.Activity
-import android.content.Context
 import android.util.SparseArray
-import android.view.SurfaceView
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
@@ -12,15 +9,16 @@ interface BarCodeContract {
     interface MvpView {
         fun retornarBarcodeLido(barcodes: SparseArray<Barcode?>?)
         fun exibirMensagemPermissao()
+        fun configurarBarcodeDetector(): BarcodeDetector
+        fun configurarCameraSource(barcodeDetector: BarcodeDetector): CameraSource
+        fun requisitarPermissaoCamera()
+        fun habilitarCameraSource()
+        fun inicializarCamera()
+        fun pararCamera()
     }
 
     interface Presenter {
-        fun configurarBarcodeDetector(context: Context): BarcodeDetector
-        fun configurarCameraSource(context: Context, barcodeDetector: BarcodeDetector): CameraSource
-        fun requisitarPermissaoCamera(activity: Activity)
-        fun habilitarCameraSource(cameraView: SurfaceView, activity: Activity)
-        fun habilitarLeituraBarcode()
-        fun verificarPermissaoCamera(cameraView: SurfaceView, grantResults: IntArray)
-        fun limparConfiguracoes()
+        fun habilitarLeituraBarcode(barcodeDetector: BarcodeDetector)
+        fun verificarPermissaoCamera(grantResults: IntArray)
     }
 }
