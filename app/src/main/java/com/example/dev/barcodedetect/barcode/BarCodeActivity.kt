@@ -67,10 +67,10 @@ class BarCodeActivity : AppCompatActivity(), BarCodeContract.MvpView {
             @SuppressLint("MissingPermission")
             override fun surfaceCreated(holder: SurfaceHolder) {
                 try {
-                    if (ContextCompat.checkSelfPermission(this@BarCodeActivity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                        requisitarPermissaoCamera()
-                    } else {
+                    if (isPermissaoAceita()) {
                         inicializarCamera()
+                    } else {
+                        requisitarPermissaoCamera()
                     }
                 } catch (ex: IOException) {
                     ex.printStackTrace()
@@ -91,9 +91,15 @@ class BarCodeActivity : AppCompatActivity(), BarCodeContract.MvpView {
     }
 
     override fun requisitarPermissaoCamera() {
-        ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.CAMERA),
-                PERMISSION_CAMERA)
+        if (!isPermissaoAceita()) {
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.CAMERA),
+                    PERMISSION_CAMERA)
+        }
+    }
+
+    override fun isPermissaoAceita(): Boolean {
+        return ContextCompat.checkSelfPermission(this@BarCodeActivity, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
     }
 
     @SuppressLint("MissingPermission")

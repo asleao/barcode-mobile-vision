@@ -8,6 +8,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector
 
 class BarCodePresenter(val mView: BarCodeContract.MvpView) : BarCodeContract.Presenter {
 
+
     override fun habilitarLeituraBarcode(barcodeDetector: BarcodeDetector) {
         barcodeDetector.setProcessor(object : Detector.Processor<Barcode?> {
 

@@ -15,6 +15,7 @@ interface BarCodeContract {
         fun habilitarCameraSource()
         fun inicializarCamera()
         fun pararCamera()
+        fun isPermissaoAceita(): Boolean
     }
 
     interface Presenter {
