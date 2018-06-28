@@ -7,12 +7,6 @@ import com.google.android.gms.vision.barcode.Barcode
 
 class MainActivity : AppCompatActivity() {
 
-    private val PERMISSION_CAMERA = 1000
-
-    companion object {
-        private const val REQUEST_BARCODE = 100
-    }
-
     public override fun onCreate(icicle: Bundle?) {
         super.onCreate(icicle)
         setContentView(R.layout.activity_main)
